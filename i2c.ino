@@ -1,39 +1,35 @@
 // Wire Slave Receiver
 // by Nicholas Zambetti <http://www.zambetti.com>
 
-// Demonstrates use of the Wire library
+// Edited for use with Robo Bronco
 // Receives data as an I2C/TWI slave device
-// Refer to the "Wire Master Writer" example for use with this
-
-// Created 29 March 2006
-
-// This example code is in the public domain.
-
-// 04-Feb-2018 mcarter adapted
 #include <Wire.h>
 #include <NewPing.h>
 
 #define SONAR_NUM 5      // Number of sensors.
 #define MAX_DISTANCE 200 // Maximum distance (in cm) to ping.
 
+// variable for sensor desired from pi
 char c = 0;
+
+// variables for sensor data
 int sensor0 = 0;
-int sensor1 = 0;
-int sensor2 = 0;
-int sensor3 = 0;
-int sensor4 = 0;
+int sensor1 = 1;
+int sensor2 = 2;
+int sensor3 = 3;
+int sensor4 = 4;
 
 NewPing sonar[SONAR_NUM] = {   // Sensor object array.
-  NewPing(13, 12, MAX_DISTANCE), // Each sensor's trigger pin, echo pin, and max distance to ping. 
-  NewPing(11, 10, MAX_DISTANCE), 
-  NewPing(9, 8, MAX_DISTANCE),
-  NewPing(7, 6, MAX_DISTANCE),
-  NewPing(5, 4, MAX_DISTANCE)
+  NewPing(12, 13, MAX_DISTANCE), // Each sensor's trigger pin, echo pin, and max distance to ping. 
+  NewPing(10, 11, MAX_DISTANCE), 
+  NewPing(8, 9, MAX_DISTANCE),
+  NewPing(6, 7, MAX_DISTANCE),
+  NewPing(4, 5, MAX_DISTANCE)
 };
 
 void setup() {
   Serial.begin(9600);
-  Wire.begin(0x8);                // join i2c bus with address #8
+  Wire.begin(0x8);              // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
   Wire.onRequest(sendData);
   Serial.println("Ready!");
@@ -42,7 +38,7 @@ void setup() {
 void loop() {
   delay(100);
   for (uint8_t i = 0; i < SONAR_NUM; i++) { // Loop through each sensor and display results.
-    delay(100); // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
+    delay(50); // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
     Serial.print(i);
     Serial.print("=");
     if (i == 0){
@@ -62,9 +58,9 @@ void loop() {
       Serial.print(sensor4);
     }
     Serial.print("cm ");
-    Serial.println();
+//    Serial.println();
   }
-  //Serial.println();
+  Serial.println();
 
 }
 
@@ -78,9 +74,10 @@ void receiveEvent(int howMany) {
   }
 }
 
+// function sends data to pi on request
+// checks which sensor output is required
 void sendData(){
   if (c == 0){
-//    Wire.write(sensor);
     Wire.write(sensor0);
   } else if (c == 1){
     Wire.write(sensor1);
